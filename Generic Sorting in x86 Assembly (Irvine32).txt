@@ -1,0 +1,57 @@
+; Generic Sorting in x86 Assembly (Irvine32)
+; Bubble sort algorithm in ascending order
+
+.386
+.model flat, stdcall
+.stack 4096
+
+INCLUDE Irvine32.inc
+
+.data
+    array       DWORD 45, 12, 78, 34, 98, 3, 65, 22, 11, 50
+    arraySize   DWORD LENGTHOF array
+
+.code
+main PROC
+    mov ecx, arraySize         ; Outer loop counter
+
+outer_loop:
+    dec ecx                    ; Reduce comparison count each pass
+    cmp ecx, 0
+    je done                    ; Finished when no more passes needed
+
+    mov ebx, 0                 ; Inner loop index
+
+inner_loop:
+    mov eax, array[ebx*4]      ; Load current element
+    mov edx, array[ebx*4 + 4]  ; Load next element
+    cmp eax, edx
+    jle no_swap                ; Skip swap if already in order
+
+    ; Swap elements
+    mov array[ebx*4], edx
+    mov array[ebx*4 + 4], eax
+
+no_swap:
+    inc ebx
+    cmp ebx, ecx
+    jl inner_loop              ; Continue inner loop if not done
+
+    jmp outer_loop             ; Next pass
+
+done:
+    ; Display sorted array
+    mov ecx, arraySize
+    mov ebx, 0                 ; Reset index for printing
+
+print_loop:
+    mov eax, array[ebx*4]
+    call WriteInt
+    call Crlf
+    inc ebx
+    cmp ebx, ecx
+    jl print_loop
+
+    exit
+main ENDP
+END main
